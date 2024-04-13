@@ -9,15 +9,24 @@
 DiscordAPI discordAPI;
 
 DiscordAPI::DiscordAPI() : isRunning(true) {
-	discord::Core::Create(clientID, DiscordCreateFlags_Default, &core);
+	printf("[DISCORD] Creating discord core.\n");
 
-	auto log_hook = [](discord::LogLevel level, const char* message) {
-		printf("[DISCORD] %s\n", message);
-	};
+	discord::Result result = discord::Core::Create(clientID, DiscordCreateFlags_NoRequireDiscord, &core);
 
-	core->SetLogHook(discord::LogLevel::Debug, log_hook);
+	if (result != discord::Result::Ok) {
+		printf("[DISCORD] Failed to launch Discord Rich Presence client, aborting!\n");
+		didntStart = true;
+	}
+	else {
+		auto log_hook = [](discord::LogLevel level, const char* message) {
+			printf("[DISCORD] %s\n", message);
+		};
 
-	SetDefaultActivity();
+		core->SetLogHook(discord::LogLevel::Debug, log_hook);
+
+		SetDefaultActivity();
+		didntStart = false;
+	}
 }
 
 void DiscordAPI::Update() {
@@ -40,9 +49,9 @@ void DiscordAPI::SetState(const char* largeIcon, const char* largeIconText, cons
 }
 
 void DiscordAPI::SetDefaultActivity() {
-	activity.SetName("Binding of Isaac: Repentance");
+	activity.SetName("The Binding of Isaac: Repentance");
 	activity.SetInstance(false);
 	activity.SetType(discord::ActivityType::Playing);
 
-	SetState("loading", "Loading...", "Loading...");
+	SetState("intro_cutscene", "Isaac and his mother...", "Watching the intro cutscene");
 }

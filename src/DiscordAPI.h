@@ -13,6 +13,7 @@ public:
 	discord::Activity activity;
 
 	bool isRunning;
+	bool didntStart;
 public:
 	DiscordAPI();
 

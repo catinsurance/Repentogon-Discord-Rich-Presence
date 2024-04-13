@@ -2,9 +2,7 @@
 #include "DiscordAPI.h"
 
 extern "C" __declspec(dllexport) int ModInit(int argc, char** argv) {
-	printf("Discord integration initialized\n");
-	printf("Discord integration initialized\n");
-	printf("Discord integration initialized\n");
+	printf("[DISCORD] Mod initialized\n");
 
 	return 0;
 }

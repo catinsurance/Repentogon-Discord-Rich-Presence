@@ -193,6 +193,10 @@ char* numToTitleIcon(int num) {
 HOOK_METHOD(MenuManager, Render, () -> void) {
 	super();
 
+	if (discordAPI.didntStart) {
+		return;
+	}
+
 	if (!discordAPI.isRunning) {
 		return;
 	}
@@ -224,14 +228,20 @@ HOOK_METHOD(MenuManager, Render, () -> void) {
 	case 7:
 		discordAPI.SetState(numToTitleIcon(currentMenuIcon), "Browsing menus", "Selecting a challenge");
 		break;
+	case 8:
+		discordAPI.SetState(numToTitleIcon(currentMenuIcon), "Browsing menus", "Viewing their item collection");
+		break;
 	case 9:
-		discordAPI.SetState(numToTitleIcon(currentMenuIcon), "Browsing menus", "Viewing stats");
+		discordAPI.SetState(numToTitleIcon(currentMenuIcon), "Browsing menus", "Checking stats");
 		break;
 	case 14:
 		discordAPI.SetState(numToTitleIcon(currentMenuIcon), "Browsing menus", "Reminiscing on enemies fought");
 		break;
 	case 15:
 		discordAPI.SetState(numToTitleIcon(currentMenuIcon), "Browsing menus", "Selecting a modded challenge");
+		break;
+	case 16:
+		discordAPI.SetState(numToTitleIcon(currentMenuIcon), "Browsing menus", "Viewing their enabled mods");
 		break;
 	default:
 		discordAPI.SetState(numToTitleIcon(currentMenuIcon), "Browsing menus", "Browsing the main menu");
@@ -241,6 +251,10 @@ HOOK_METHOD(MenuManager, Render, () -> void) {
 
 HOOK_METHOD(Game, Render, () -> void) {
 	super();
+
+	if (discordAPI.didntStart) {
+		return;
+	}
 
 	if (!discordAPI.isRunning) {
 		return;
@@ -302,6 +316,15 @@ HOOK_METHOD(Game, Render, () -> void) {
 // Handle special death screen stuff.
 HOOK_METHOD(GameOver, Show, () -> void) {
 	super();
+
+	if (discordAPI.didntStart) {
+		return;
+	}
+
+	if (!discordAPI.isRunning) {
+		return;
+	}
+
 	deathScreenShowing = true;
 
 	discordAPI.SetState("death", "Game over!", "Contemplating their death");
@@ -309,6 +332,11 @@ HOOK_METHOD(GameOver, Show, () -> void) {
 
 HOOK_STATIC(Manager, Update, () -> void, __stdcall) {
 	super();
+
+	// Didn't start because Discord wasn't open.
+	if (discordAPI.didntStart) {
+		return;
+	}
 
 	discordAPI.Update();
 }
