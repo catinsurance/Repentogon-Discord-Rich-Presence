@@ -3,3 +3,5 @@ include/
 libs/
 libzhl/
 .vs/
+src/scripts/.vscode/
+src/scripts/.luarc.json

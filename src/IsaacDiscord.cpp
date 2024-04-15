@@ -1,7 +1,8 @@
-#include <ctime>
+﻿#include <ctime>
 #include "IsaacRepentance.h"
 #include "HookSystem.h"
 #include "DiscordAPI.h"
+#include "ConfigHandler.h"
 
 int prevState = 0;
 
@@ -14,6 +15,8 @@ enum LastGameState {
 int lastGameState = LastGameState::LAST_GAME_STATE_LOADING;
 int currentMenuIcon = 1;
 bool deathScreenShowing = false;
+bool luaConfigInit = false;
+
 
 char* playerToPortrait(int playerType) {
 	switch (playerType) {
@@ -105,6 +108,73 @@ char* playerToPortrait(int playerType) {
 	}
 }
 
+char* moddedPlayerToPortrait(const char* name, bool isTainted) {
+	std::string strName = std::string(name); // I couldn't compare it before. am I stupid?
+
+	// Samael
+	if (strName == "Samael") {
+		if (isTainted) {
+			return "playerportrait_samael_b";
+		}
+		else {
+			return "playerportrait_samael";
+		}
+	}
+	// Sheriff
+	else if (strName == "The Sheriff") {
+		return "playerportrait_sheriff";
+	}
+	// Fiend Folio
+	else if (strName == "Fiend") {
+		if (isTainted) {
+			return "playerportrait_fiend_b";
+		}
+		else {
+			return "playerportrait_fiend";
+		}
+	}
+	else if (strName == "Golem") {
+		return "playerportrait_golem";
+	}
+	// Revelations
+	else if (strName == "Sarah") {
+		return "playerportrait_sarah";
+	}
+	else if (strName == "Dante" || strName == "Charon") {
+		return "playerportrait_dante";
+	}
+	// Epiphany
+	// These characters have zero width spaces in front of their names
+	// I wasn't able to compare their character name with my own string (even with \u200b in front)
+	// So I'm using .find(). Hopefully this isn't like the slowest possible solution.
+	else if (strName.find("Isaac") != std::string::npos) {
+		return "playerportrait_epiphany_isaac";
+	}
+	else if (strName.find("Magdalene") != std::string::npos) {
+		return "playerportrait_epiphany_magdalene";
+	}
+	else if (strName.find("Cain") != std::string::npos) {
+		return "playerportrait_epiphany_cain";
+	}
+	else if (strName.find("Judas") != std::string::npos) {
+		return "playerportrait_epiphany_judas";
+	}
+	else if (strName.find("Samson") != std::string::npos) {
+		return "playerportrait_epiphany_samson";
+	}
+	else if (strName.find("Eden") != std::string::npos) {
+		return "playerportrait_epiphany_eden";
+	}
+	else if (strName.find("Lost") != std::string::npos) {
+		return "playerportrait_epiphany_lost";
+	}
+	else if (strName.find("Keeper") != std::string::npos) {
+		return "playerportrait_epiphany_keeper";
+	}
+	
+	return "unknown";
+}
+
 char* stbToString(int stb) {
 	switch (stb) {
 	case 1:
@@ -168,6 +238,32 @@ char* stbToString(int stb) {
 	}
 }
 
+char* moddedStageToString(const char* stageName) {
+	if (!modOptions.Get("Customization", "ShowModdedStages")) {
+		return "Exploring a the unknown depths below";
+	}
+
+	std::string strStageName = std::string(stageName); // I couldn't compare before, am I stupid?
+	if (strStageName == "Boiler" || strStageName == "Boiler 2" || strStageName == "Boiler XL") {
+		return "Boiling in the Boiler";
+	}
+
+	if (strStageName == "Glacier" || strStageName == "Glacier 2" || strStageName == "Glacier XL") {
+		return "Slipping through Glacier";
+	}
+
+	if (strStageName == "Tomb" || strStageName == "Tomb 2" || strStageName == "Tomb XL") {
+		return "Raiding the Tomb";
+	}
+
+	if (strStageName == "The Future" || strStageName == "The Future 2" || strStageName == "The Future XL") {
+		return "Seeing into The Future";
+	}
+
+	// Default
+	return "Exploring the unknown depths below";
+}
+
 char* numToTitleIcon(int num) {
 	switch (num) {
 	case 1:
@@ -190,6 +286,82 @@ char* numToTitleIcon(int num) {
 
 }
 
+char* getStageString() {
+	lua_State* L = g_LuaEngine->_state;
+	lua_getglobal(L, "StageAPI");
+	if (!lua_istable(L, -1)) {
+		int stbStage = RoomConfig::GetStageID(g_Game->_stage, g_Game->_stageType, -1);
+		return stbToString(stbStage);
+	}
+	else {
+		// Check stage name
+		lua_getfield(L, -1, "GetCurrentStage");
+		int error = lua_pcall(L, 0, 1, 0);
+		if (error) {
+			// Just return normal stage
+			int stbStage = RoomConfig::GetStageID(g_Game->_stage, g_Game->_stageType, -1);
+			return stbToString(stbStage);
+		}
+		else {
+			// Check if nil
+
+			if (lua_istable(L, -1)) {
+				lua_getfield(L, -1, "Name");
+
+				// It's a string.
+				if (lua_isstring(L, -1)) {
+					const char* moddedStageName = lua_tostring(L, -1);
+					char* returnValue = moddedStageToString(moddedStageName);
+					lua_pop(L, 3);
+					return returnValue;
+				}
+				else {
+					// Just return normal stage
+					int stbStage = RoomConfig::GetStageID(g_Game->_stage, g_Game->_stageType, -1);
+					
+					if (lua_isnil(L, -1)) {
+						lua_pop(L, 2);
+					}
+					else {
+						lua_pop(L, 3);
+					}
+
+					return stbToString(stbStage);
+				}
+			}
+			else {
+				int stbStage = RoomConfig::GetStageID(g_Game->_stage, g_Game->_stageType, -1);
+
+				if (lua_isnil(L, -1)) {
+					lua_pop(L, 1);
+				}
+				else {
+					lua_pop(L, 2);
+				}
+
+				return stbToString(stbStage);
+			}
+		}
+	}
+}
+
+void InitLuaConfig() {
+	// Load the ImGui lua file
+	std::string scriptPath = std::filesystem::current_path().string() + "/isaac-discord-scripts/ImGuiHandler.lua";
+	printf("[DISCORD] Attempting to load %s\n", scriptPath.c_str());
+	if (std::filesystem::exists(scriptPath)) {
+		printf("[DISCORD] Running config script.\n");
+		g_LuaEngine->RunScript(scriptPath.c_str());
+	}
+	else {
+		printf("[DISCORD] Config script did not exist in location. Run failsafe.\n");
+		modOptions.luaConfigFailed = true;
+	}
+
+	// Initialize settings
+	modOptions.InitLua();
+}
+
 HOOK_METHOD(MenuManager, Render, () -> void) {
 	super();
 
@@ -201,8 +373,15 @@ HOOK_METHOD(MenuManager, Render, () -> void) {
 		return;
 	}
 
+	// Load this here to make sure we load after ImGui and other core scripts
+	if (!luaConfigInit) {
+		luaConfigInit = true;
+		InitLuaConfig();
+	}
+
 	if (lastGameState != LastGameState::LAST_GAME_STATE_MENU) {
 		lastGameState = LastGameState::LAST_GAME_STATE_MENU;
+		modOptions.LoadFromLua();
 		RNG rng = RNG();
 		rng.SetSeed(max(Random(), 1), 35);
 		currentMenuIcon = rng.RandomInt(7) + 1;
@@ -249,7 +428,7 @@ HOOK_METHOD(MenuManager, Render, () -> void) {
 	}
 }
 
-HOOK_METHOD(Game, Render, () -> void) {
+HOOK_METHOD(Game, Update, () -> void) {
 	super();
 
 	if (discordAPI.didntStart) {
@@ -263,6 +442,7 @@ HOOK_METHOD(Game, Render, () -> void) {
 	// Reset if restarted run or new game
 	if (lastGameState != LastGameState::LAST_GAME_STATE_GAME || g_Game->_frameCount < 1) {
 		lastGameState = LastGameState::LAST_GAME_STATE_GAME;
+		modOptions.LoadFromLua();
 		discordAPI.SetTimestamp(time(0));
 		deathScreenShowing = false;
 	}
@@ -270,7 +450,7 @@ HOOK_METHOD(Game, Render, () -> void) {
 	Entity_Player* player = g_Game->GetPlayer(0);
 	if (player != nullptr && !deathScreenShowing) {
 		int playerType = player->GetPlayerType();
-		int stbStage = RoomConfig::GetStageID(g_Game->_stage, g_Game->_stageType, -1);
+		char* stageString = getStageString();
 
 		switch (g_Game->GetDifficulty()) { // https://wofsauge.github.io/IsaacDocs/rep/enums/Difficulty.html
 		case 0:
@@ -305,10 +485,27 @@ HOOK_METHOD(Game, Render, () -> void) {
 			std::string buf("Playing as ");
 			buf.append(charName);
 
-			discordAPI.SetState(playerToPortrait(playerType), buf.c_str(), stbToString(stbStage));
+			discordAPI.SetState(playerToPortrait(playerType), buf.c_str(), stageString);
 		}
 		else {
-			discordAPI.SetState(playerToPortrait(playerType), "Playing as a modded character", stbToString(stbStage));
+			if (modOptions.Get("Customization", "ShowModdedCharacters")) {
+				uint32_t unk;
+
+				std::string name = std::string(playerConfig->_name);
+
+				std::string buf("Playing as ");
+				buf.append(name);
+
+				bool isTainted = false;
+				if (!playerConfig->_bSkinParentName.empty()) {
+					isTainted = true;
+				}
+
+				discordAPI.SetState(moddedPlayerToPortrait(name.c_str(), isTainted), buf.c_str(), stageString);
+			}
+			else {
+				discordAPI.SetState("unknown", "Playing as a modded character", stageString);
+			}
 		}
 	}
 }

@@ -3,6 +3,7 @@
 #include "IsaacRepentance.h"
 #include "discord-shit/discord.h"
 #include "Log.h"
+#include "ConfigHandler.h"
 
 #include "DiscordAPI.h"
 
@@ -36,7 +37,12 @@ void DiscordAPI::Update() {
 }
 
 void DiscordAPI::SetTimestamp(discord::Timestamp timestamp) {
-	activity.GetTimestamps().SetStart(timestamp);
+	if (modOptions.Get("Customization", "ShowTimer")) {
+		activity.GetTimestamps().SetStart(timestamp);
+	}
+	else {
+		activity.GetTimestamps().SetStart(discord::Timestamp());
+	}
 }
 
 void DiscordAPI::SetState(const char* largeIcon, const char* largeIconText, const char* state) {
