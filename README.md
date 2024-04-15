@@ -20,6 +20,14 @@ Then, unzip the file in your Isaac's root directory. **Not your mods folder!** T
 
 ![Dragging the files from zip to game directory](resources/rp_example_2.gif "Placing downloaded files in the game's root directory")
 
+## How to uninstall
+
+`zhlIsaacDiscord.dll` is the core of the mod, and deleting it will delete the mod and the code that loads the other files. If you'd like to fully uninstall, delete `zhlIsaacDiscord.dll`, `discord_game_sdk.dll` and `isaac-discord-scripts` in your game's root directory (where `isaac-ng.exe` resides).
+
+If you'd like to delete the config file and any other save data, head over to where the game stores your save data (typically `Documents/My Games/Binding of Isaac Repentance/` on Windows), and delete the folder `DiscordRichPresence`. You can also find the mod's `options.ini` here, if you just wanted to edit it manually.
+
 ## Fun screenshots
 
 ![The mod working in game, on the title screen, and in different difficulties.](resources/rp_example_1.png "The mod in action")
+
+![The configuration menu in game.](resources/rp_example_3.png "The configuration menu")
