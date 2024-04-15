@@ -306,7 +306,7 @@ char* stbToString(int stb) {
 
 char* moddedStageToString(const char* stageName) {
 	if (!modOptions.Get("Customization", "ShowModdedStages")) {
-		return "Exploring a the unknown depths below";
+		return "Exploring the unknown depths below";
 	}
 
 	std::string strStageName = std::string(stageName); // I couldn't compare before, am I stupid?
