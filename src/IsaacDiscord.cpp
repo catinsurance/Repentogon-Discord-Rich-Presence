@@ -143,6 +143,72 @@ char* moddedPlayerToPortrait(const char* name, bool isTainted) {
 	else if (strName == "Dante" || strName == "Charon") {
 		return "playerportrait_dante";
 	}
+	// Andromeda
+	else if (strName == "Andromeda") {
+		return "playerportrait_andromeda";
+	}
+	else if (strName == "AndromedaB") { // Tainted Andromeda has a separate name for some reason
+		return "playerportrait_andromeda_b";
+	}
+	// Car (lol!)
+	else if (strName == "Car") {
+		return "playerportrait_car";
+	}
+	// Bertran
+	else if (strName == "Bertran") {
+		return "playerportrait_bertran";
+	}
+	// Sacred Dreams
+	else if (strName == "The Dream Guard") {
+		return "playerportrait_thedreamguard";
+	}
+	// Bael
+	else if (strName == "Bael") {
+		return "playerportrait_bael";
+	}
+	// Eevee Reunited (Demo) (hi sanio!!)
+	else if (strName == "Eevee") {
+		return "playerportrait_eevee";
+	}
+	// Retribution
+	else if (strName == "Icarus") {
+		return "playerportrait_icarus";
+	}
+	else if (strName == "Mammon") {
+		if (isTainted) {
+			return "playerportrait_mammon_b";
+		}
+		else {
+			return "playerportrait_mammon";
+		}
+	}
+	// Arachna
+	else if (strName == "Arachna") {
+		if (isTainted) {
+			return "playerportrait_arachna_b";
+		}
+		else {
+			return "playerportrait_arachna";
+		}
+	}
+	// Sodom and Gomorrah
+	else if (strName == "Sodom" || strName == "Gomorrah") {
+		if (isTainted) {
+			return "playerportrait_sodomgomorrah_b";
+		}
+		else {
+			return "playerportrait_sodomgomorrah";
+		}
+	}
+	// The Deleted
+	else if (strName == "Deleted") {
+		if (isTainted) {
+			return "playerportrait_deleted_b";
+		}
+		else {
+			return "playerportrait_deleted";
+		}
+	}
 	// Epiphany
 	// These characters have zero width spaces in front of their names
 	// I wasn't able to compare their character name with my own string (even with \u200b in front)

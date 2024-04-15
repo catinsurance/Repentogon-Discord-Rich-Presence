@@ -21,7 +21,7 @@ local settingInformation = {
 
     ShowTimer = {
         Name = "Show Timer",
-        Description = "Show the timer denoting how long you've been on the menu/in a run."
+        Description = "Show the timer denoting how long you've been on the menu/in a run. Requires restart after applying for changes to take effect."
     }
 }
 

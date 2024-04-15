@@ -10,7 +10,7 @@
 DiscordAPI discordAPI;
 
 DiscordAPI::DiscordAPI() : isRunning(true) {
-	printf("[DISCORD] Creating discord core.\n");
+	printf("[DISCORD] Creating discord core\n");
 
 	discord::Result result = discord::Core::Create(clientID, DiscordCreateFlags_NoRequireDiscord, &core);
 
