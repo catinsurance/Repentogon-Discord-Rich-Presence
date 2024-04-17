@@ -3,8 +3,6 @@
 #include "LuaCore.h"
 #include <HookSystem.h>
 
-IsaacDiscordOptions modOptions;
-
 LUA_FUNCTION(Lua_DiscordRichPresence_SaveAndReload) {
 	modOptions.LoadFromLua();
 	modOptions.SaveAll();
