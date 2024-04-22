@@ -14,6 +14,7 @@ enum LastGameState {
 };
 
 int lastGameState = LastGameState::LAST_GAME_STATE_LOADING;
+int prevMenu = 0;
 int currentMenuIcon = 1;
 bool deathScreenShowing = false;
 bool luaConfigInit = false;
@@ -133,17 +134,28 @@ HOOK_METHOD(MenuManager, Render, () -> void) {
 		InitLuaConfig();
 	}
 
+	if (discordAPI.luaToggle) {
+		return;
+	}
+
 	if (lastGameState != LastGameState::LAST_GAME_STATE_MENU) {
 		lastGameState = LastGameState::LAST_GAME_STATE_MENU;
 		modOptions.LoadFromLua();
 		RNG rng = RNG();
 		rng.SetSeed(max(Random(), 1), 35);
 		currentMenuIcon = rng.RandomInt(7) + 1;
-		discordAPI.SetTimestamp(time(0));
+		discordAPI.SetStartTimestamp(time(0));
+		discordAPI.luaToggle = false;
 		deathScreenShowing = false;
 	}
 
 	int menu = g_MenuManager->_selectedMenuID;
+
+	if (menu == prevMenu) {
+		return;
+	}
+
+	menu = prevMenu;
 
 	discordAPI.activity.GetAssets().SetSmallImage("");
 	discordAPI.activity.GetAssets().SetSmallText("");
@@ -182,24 +194,12 @@ HOOK_METHOD(MenuManager, Render, () -> void) {
 	}
 }
 
-HOOK_METHOD(Game, Update, () -> void) {
-	super();
-
-	if (discordAPI.didntStart) {
+void updateInGame() {
+	if (discordAPI.luaToggle) {
 		return;
 	}
 
-	if (!discordAPI.isRunning) {
-		return;
-	}
-
-	// Reset if restarted run or new game
-	if (lastGameState != LastGameState::LAST_GAME_STATE_GAME || g_Game->_frameCount < 1) {
-		lastGameState = LastGameState::LAST_GAME_STATE_GAME;
-		modOptions.LoadFromLua();
-		discordAPI.SetTimestamp(time(0));
-		deathScreenShowing = false;
-	}
+	prevMenu = 0;
 
 	Entity_Player* player = g_Game->GetPlayer(0);
 	if (player != nullptr && !deathScreenShowing) {
@@ -264,6 +264,35 @@ HOOK_METHOD(Game, Update, () -> void) {
 	}
 }
 
+HOOK_METHOD(Game, Update, () -> void) {
+	super();
+
+	if (discordAPI.didntStart) {
+		return;
+	}
+
+	if (!discordAPI.isRunning) {
+		return;
+	}
+
+	// Reset if restarted run or new game
+	if (lastGameState != LastGameState::LAST_GAME_STATE_GAME || g_Game->_frameCount < 1) {
+		lastGameState = LastGameState::LAST_GAME_STATE_GAME;
+		modOptions.LoadFromLua();
+		discordAPI.SetStartTimestamp(time(0));
+		deathScreenShowing = false;
+		discordAPI.luaToggle = false;
+		updateInGame();
+	}
+}
+
+HOOK_METHOD(Room, Init, (int param_1, RoomDescriptor* descriptor) -> void) {
+	super(param_1, descriptor);
+
+	// Update every new room, because that's usually a good interval of change.
+	updateInGame();
+}
+
 // Handle special death screen stuff.
 HOOK_METHOD(GameOver, Show, () -> void) {
 	super();
@@ -276,9 +305,14 @@ HOOK_METHOD(GameOver, Show, () -> void) {
 		return;
 	}
 
+	if (discordAPI.luaToggle) {
+		return;
+	}
+
 	deathScreenShowing = true;
 
 	discordAPI.SetState("death", "Game over!", "Contemplating their death");
+	discordAPI.UpdateActivity();
 }
 
 HOOK_STATIC(Manager, Update, () -> void, __stdcall) {
@@ -290,4 +324,9 @@ HOOK_STATIC(Manager, Update, () -> void, __stdcall) {
 	}
 
 	discordAPI.Update();
+	discordAPI.lastUpdate += 1;
+
+	if (discordAPI.lastUpdate >= discordAPI.updateInterval) {
+		discordAPI.UpdateActivity();
+	}
 }

@@ -5,8 +5,6 @@
 
 #include <ctime>
 
-const char* TimestampMT = "Timestamp";
-
 LuaTimestamp::LuaTimestamp(long offset) {
 	timestamp = discord::Timestamp(time(0)) + discord::Timestamp(offset);
 }
