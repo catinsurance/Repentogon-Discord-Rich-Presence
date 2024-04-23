@@ -92,6 +92,7 @@ void DiscordAPI::SetState(const char* largeIcon, const char* largeIconText, cons
 	activity.GetAssets().SetLargeImage(largeIcon);
 	activity.GetAssets().SetLargeText(largeIconText);
 
+	activity.SetDetails("");
 	activity.SetState(state);
 }
 

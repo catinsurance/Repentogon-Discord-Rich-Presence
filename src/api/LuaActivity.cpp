@@ -14,8 +14,6 @@ LUA_FUNCTION(Lua_Activity_SetLargeImage) {
 		discordAPI.SetLargeCaption(caption);
 	}
 
-	printf("image path: %s | caption: %s\n", imagePath, caption);
-
 	return 0;
 }
 
@@ -96,7 +94,6 @@ LUA_FUNCTION(Lua_Activity_GetSubtitle) {
 
 LUA_FUNCTION(Lua_Activity_Update) {
 	discordAPI.UpdateActivity();
-	printf("Large image: %s\n", discordAPI.activity.GetAssets().GetLargeImage());
 
 	return 0;
 }

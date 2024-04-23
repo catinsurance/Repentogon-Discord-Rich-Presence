@@ -134,10 +134,6 @@ HOOK_METHOD(MenuManager, Render, () -> void) {
 		InitLuaConfig();
 	}
 
-	if (discordAPI.luaToggle) {
-		return;
-	}
-
 	if (lastGameState != LastGameState::LAST_GAME_STATE_MENU) {
 		lastGameState = LastGameState::LAST_GAME_STATE_MENU;
 		modOptions.LoadFromLua();
@@ -149,13 +145,17 @@ HOOK_METHOD(MenuManager, Render, () -> void) {
 		deathScreenShowing = false;
 	}
 
+	if (discordAPI.luaToggle) {
+		return;
+	}
+
 	int menu = g_MenuManager->_selectedMenuID;
 
 	if (menu == prevMenu) {
 		return;
 	}
 
-	menu = prevMenu;
+	prevMenu = menu;
 
 	discordAPI.activity.GetAssets().SetSmallImage("");
 	discordAPI.activity.GetAssets().SetSmallText("");
@@ -197,6 +197,10 @@ HOOK_METHOD(MenuManager, Render, () -> void) {
 void updateInGame() {
 	if (discordAPI.luaToggle) {
 		return;
+	}
+
+	if (discordAPI.GetEndTimestamp() > discord::Timestamp()) {
+		discordAPI.SetStartTimestamp(time(0));
 	}
 
 	prevMenu = 0;
@@ -264,9 +268,7 @@ void updateInGame() {
 	}
 }
 
-HOOK_METHOD(Game, Update, () -> void) {
-	super();
-
+HOOK_METHOD(Room, Init, (int param_1, RoomDescriptor* descriptor) -> void) {
 	if (discordAPI.didntStart) {
 		return;
 	}
@@ -276,21 +278,18 @@ HOOK_METHOD(Game, Update, () -> void) {
 	}
 
 	// Reset if restarted run or new game
-	if (lastGameState != LastGameState::LAST_GAME_STATE_GAME || g_Game->_frameCount < 1) {
+	if (lastGameState != LastGameState::LAST_GAME_STATE_GAME || deathScreenShowing) {
 		lastGameState = LastGameState::LAST_GAME_STATE_GAME;
 		modOptions.LoadFromLua();
 		discordAPI.SetStartTimestamp(time(0));
 		deathScreenShowing = false;
 		discordAPI.luaToggle = false;
-		updateInGame();
 	}
-}
-
-HOOK_METHOD(Room, Init, (int param_1, RoomDescriptor* descriptor) -> void) {
-	super(param_1, descriptor);
 
 	// Update every new room, because that's usually a good interval of change.
 	updateInGame();
+
+	super(param_1, descriptor);
 }
 
 // Handle special death screen stuff.
