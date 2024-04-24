@@ -3,6 +3,7 @@
 #include "IsaacRepentance.h"
 #include "HookSystem.h"
 #include "../DiscordAPI.h"
+#include "../GameInfoStrings.h"
 
 LUA_FUNCTION(Lua_Activity_SetLargeImage) {
 	const char* imagePath = luaL_checkstring(L, 1);
@@ -167,6 +168,14 @@ LUA_FUNCTION(Lua_Activity_ClearTimestamp) {
 	return 0;
 }
 
+LUA_FUNCTION(Lua_Activity_RegisterCharacter) {
+	int playerType = luaL_checkinteger(L, 1);
+	std::string imagePath = luaL_checkstring(L, 2);
+	luaPlayerPortrait[playerType] = imagePath;
+
+	return 0;
+}
+
 static void RegisterActivity(lua_State* L) {
 	lua_newtable(L);
 
@@ -197,6 +206,8 @@ static void RegisterActivity(lua_State* L) {
 		lua::TableAssoc(L, "ClearTimestamp", Lua_Activity_ClearTimestamp);
 		
 		lua::TableAssoc(L, "SetDefaultActivity", Lua_Activity_SetDefaultEnabled);
+		lua::TableAssoc(L, "SetCharacterPortrait", Lua_Activity_RegisterCharacter);
+		
 		lua::TableAssoc(L, "Update", Lua_Activity_Update);
 
 	lua_setglobal(L, "Activity");

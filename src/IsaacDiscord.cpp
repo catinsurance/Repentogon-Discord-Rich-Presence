@@ -259,7 +259,14 @@ void updateInGame() {
 					isTainted = true;
 				}
 
-				discordAPI.SetState(moddedPlayerToPortrait(name.c_str(), isTainted), buf.c_str(), stageString);
+				if (luaPlayerPortrait.count(playerType)) {
+					std::string portrait = luaPlayerPortrait[playerType];
+					discordAPI.SetState(portrait.c_str(), buf.c_str(), stageString);
+				}
+				else {
+					discordAPI.SetState(moddedPlayerToPortrait(name.c_str(), isTainted), buf.c_str(), stageString);
+				}
+
 			}
 			else {
 				discordAPI.SetState("unknown", "Playing as a modded character", stageString);

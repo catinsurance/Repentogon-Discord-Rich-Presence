@@ -1,6 +1,8 @@
 #include "GameInfoStrings.h"
 #include <string>
 
+std::map<int, std::string> luaPlayerPortrait = {};
+
 char* moddedPlayerToPortrait(const char* name, bool isTainted) {
 	std::string strName = std::string(name); // I couldn't compare it before. am I stupid?
 
@@ -135,6 +137,12 @@ char* moddedPlayerToPortrait(const char* name, bool isTainted) {
 }
 
 char* playerToPortrait(int playerType) {
+
+	if (luaPlayerPortrait.count(playerType)) {
+		std::string portrait = luaPlayerPortrait[playerType];
+		return portrait.data();
+	}
+
 	switch (playerType) {
 	case 0:
 		return "playerportrait_isaac";
