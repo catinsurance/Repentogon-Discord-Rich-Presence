@@ -11,7 +11,7 @@ LUA_FUNCTION(Lua_Activity_SetLargeImage) {
 
 	discordAPI.SetLargeImage(imagePath);
 
-	if (caption != "__NONE__") {
+	if (caption != std::string("__NONE__")) {
 		discordAPI.SetLargeCaption(caption);
 	}
 
@@ -42,7 +42,7 @@ LUA_FUNCTION(Lua_Activity_SetSmallImage) {
 
 	discordAPI.SetSmallImage(imagePath);
 
-	if (caption != "__NONE__") {
+	if (caption != std::string("__NONE__")) {
 		discordAPI.SetSmallCaption(caption);
 	}
 
