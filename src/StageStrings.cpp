@@ -20,7 +20,7 @@ char* stageToTitle(int stb) {
 	case 8:
 		return "Paying respects in the Necropolis";
 	case 9:
-		return "Struggling to see in the darkness of the Dank Depths";
+		return "Stumbling through Dank Depths";
 	case 10:
 		return "Visiting their future's past in Womb";
 	case 11:
