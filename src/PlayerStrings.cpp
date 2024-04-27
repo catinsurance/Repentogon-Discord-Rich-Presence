@@ -104,6 +104,14 @@ char* moddedPlayerToPortrait(const char* name, bool isTainted) {
 			return "playerportrait_deleted";
 		}
 	}
+	// Felix and Harold
+	else if (strName == "Felix") {
+		return "playerportrait_felix";
+	}
+	// Jericho
+	else if (strName == "Jericho") {
+		return "playerportrait_jericho";
+	}
 	// Epiphany
 	// These characters have zero width spaces in front of their names
 	// I wasn't able to compare their character name with my own string (even with \u200b in front)
