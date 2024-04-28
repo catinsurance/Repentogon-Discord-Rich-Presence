@@ -1,3 +1,6 @@
+#include <map>
+#include <string>
+
 // Takes the stage STB id and returns a title for it.
 char* stageToTitle(int stb);
 
@@ -9,3 +12,6 @@ char* moddedPlayerToPortrait(const char* name, bool isTainted);
 
 // Returns a player id and returns a portrait for it.
 char* playerToPortrait(int playerType);
+
+extern std::map<int, std::string> luaPlayerPortrait;
+extern std::map<int, std::string> luaStageTitle;

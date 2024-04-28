@@ -1,6 +1,8 @@
 #include "GameInfoStrings.h"
 #include <string>
 
+std::map<int, std::string> luaPlayerPortrait = {};
+
 char* moddedPlayerToPortrait(const char* name, bool isTainted) {
 	std::string strName = std::string(name); // I couldn't compare it before. am I stupid?
 
@@ -102,6 +104,14 @@ char* moddedPlayerToPortrait(const char* name, bool isTainted) {
 			return "playerportrait_deleted";
 		}
 	}
+	// Felix and Harold
+	else if (strName == "Felix") {
+		return "playerportrait_felix";
+	}
+	// Jericho
+	else if (strName == "Jericho") {
+		return "playerportrait_jericho";
+	}
 	// Epiphany
 	// These characters have zero width spaces in front of their names
 	// I wasn't able to compare their character name with my own string (even with \u200b in front)
@@ -135,6 +145,12 @@ char* moddedPlayerToPortrait(const char* name, bool isTainted) {
 }
 
 char* playerToPortrait(int playerType) {
+
+	if (luaPlayerPortrait.count(playerType)) {
+		std::string portrait = luaPlayerPortrait[playerType];
+		return portrait.data();
+	}
+
 	switch (playerType) {
 	case 0:
 		return "playerportrait_isaac";

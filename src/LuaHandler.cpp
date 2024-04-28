@@ -20,6 +20,16 @@ HOOK_METHOD(LuaEngine, RegisterClasses, () -> void) {
 	lua_pushcfunction(L, Lua_DiscordRichPresence_SaveAndReload);
 	lua_setglobal(L, "DiscordRichPresence_SaveAndReload");
 
+	// Load the enumerators file
+	std::string scriptPath = std::filesystem::current_path().string() + "/isaac-discord-scripts/Enums.lua";
+	printf("[DISCORD] Attempting to load %s\n", scriptPath.c_str());
+	if (std::filesystem::exists(scriptPath)) {
+		printf("[DISCORD] Running enums script.\n");
+		g_LuaEngine->RunScript(scriptPath.c_str());
+	}
+	else {
+		printf("[DISCORD] Couldn't load enums script.\n");
+	}
 }
 
 HOOK_STATIC(Isaac, Shutdown, () -> void, __cdecl) {
