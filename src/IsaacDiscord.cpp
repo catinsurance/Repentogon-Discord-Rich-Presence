@@ -277,10 +277,12 @@ void updateInGame() {
 
 HOOK_METHOD(Room, Init, (int param_1, RoomDescriptor* descriptor) -> void) {
 	if (discordAPI.didntStart) {
+		super(param_1, descriptor);
 		return;
 	}
 
 	if (!discordAPI.isRunning) {
+		super(param_1, descriptor);
 		return;
 	}
 
