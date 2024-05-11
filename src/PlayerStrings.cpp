@@ -165,7 +165,7 @@ char* playerToPortrait(int playerType) {
 	case 5:
 		return "playerportrait_eve";
 	case 6:
-		return "playerportarit_samson";
+		return "playerportrait_samson";
 	case 7:
 		return "playerportrait_azazel";
 	case 8:

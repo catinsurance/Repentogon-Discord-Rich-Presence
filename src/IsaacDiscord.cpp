@@ -275,14 +275,14 @@ void updateInGame() {
 	}
 }
 
-HOOK_METHOD(Room, Init, (int param_1, RoomDescriptor* descriptor) -> void) {
+HOOK_METHOD(Game, Update, () -> void) {
+	super();
+
 	if (discordAPI.didntStart) {
-		super(param_1, descriptor);
 		return;
 	}
 
 	if (!discordAPI.isRunning) {
-		super(param_1, descriptor);
 		return;
 	}
 
@@ -297,8 +297,6 @@ HOOK_METHOD(Room, Init, (int param_1, RoomDescriptor* descriptor) -> void) {
 
 	// Update every new room, because that's usually a good interval of change.
 	updateInGame();
-
-	super(param_1, descriptor);
 }
 
 // Handle special death screen stuff.
@@ -336,5 +334,6 @@ HOOK_STATIC(Manager, Update, () -> void, __stdcall) {
 
 	if (discordAPI.lastUpdate >= discordAPI.updateInterval) {
 		discordAPI.UpdateActivity();
+		discordAPI.lastUpdate = 0;
 	}
 }

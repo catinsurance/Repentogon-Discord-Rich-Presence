@@ -15,7 +15,7 @@ DiscordAPI::DiscordAPI() : isRunning(true) {
 	discord::Result result = discord::Core::Create(clientID, DiscordCreateFlags_NoRequireDiscord, &core);
 
 	if (result != discord::Result::Ok) {
-		printf("[DISCORD] Failed to launch Discord Rich Presence client, aborting!\n");
+		printf("[DISCORD] Failed to launch Discord Rich Presence client, aborting! (Error %d)\n", result);
 		didntStart = true;
 	}
 	else {
